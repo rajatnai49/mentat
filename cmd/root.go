@@ -14,11 +14,6 @@ var rootCmd = &cobra.Command{
 	Use:     "mentant",
 	Aliases: []string{"mnt"},
 	Short:   "Personal task and knowledge management tool.",
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg = config.Load()
-		color.Green("Vault Path: %s", cfg.VaultPath)
-		color.Green("DB Path: %s", cfg.VaultPath)
-	},
 	Version: "1.0.0",
 }
 
