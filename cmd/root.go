@@ -14,6 +14,11 @@ var rootCmd = &cobra.Command{
 	Use:     "mentant",
 	Aliases: []string{"mnt"},
 	Short:   "Personal task and knowledge management tool.",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if cfg == nil {
+			cfg = config.Load()
+		}
+	},
 	Version: "1.0.0",
 }
 

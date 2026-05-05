@@ -6,26 +6,23 @@ import (
 	"os/exec"
 
 	"github.com/fatih/color"
-	"github.com/rajatnai49/mentat/config"
 	"github.com/rajatnai49/mentat/parsers"
 	"github.com/rajatnai49/mentat/vault"
 	"github.com/spf13/cobra"
 )
 
-var status = &cobra.Command{
+var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Personal task and knowledge management tool.",
 	Run: func(cmd *cobra.Command, args []string) {
 		color.Green("Status")
-		cfg = config.Load()
 		nts := parsers.FolderIterator(cfg.VaultPath, parsers.DailyFileParser)
-		generateSummary(cfg, nts)
+		generateSummary(nts)
 	},
-	Version: "1.0.0",
 }
 
 func init() {
-	rootCmd.AddCommand(status)
+	rootCmd.AddCommand(statusCmd)
 }
 
 type TaskItem struct {
@@ -33,7 +30,7 @@ type TaskItem struct {
 	Filepath string
 }
 
-func generateSummary(cfg *config.Config, noteTasks []*vault.NoteTask) {
+func generateSummary(noteTasks []*vault.NoteTask) {
 	var items []TaskItem
 	for _, nt := range noteTasks {
 		for _, t := range nt.Tasks {
@@ -61,7 +58,7 @@ func generateSummary(cfg *config.Config, noteTasks []*vault.NoteTask) {
 
 	selected := items[choice-1]
 
-	cmd := exec.Command("nvim", cfg.VaultPath+"/"+selected.Filepath)
+	cmd := exec.Command("nvim", selected.Filepath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

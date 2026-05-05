@@ -48,7 +48,10 @@ func DailyFileParser(filename string) (*vault.NoteTask, error) {
 			t.Done = true
 		}
 
-		splits := strings.Split(l1, "]")
+		splits := strings.SplitN(l1, "]", 2)
+		if len(splits) < 2 {
+			continue
+		}
 
 		t.Title = strings.TrimSpace(splits[1])
 

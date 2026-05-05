@@ -18,10 +18,9 @@ func FolderIterator(dir string, parserFunc ParserFunc) []*vault.NoteTask {
 	var nts []*vault.NoteTask
 
 	for _, v := range entries {
-		file_path := filepath.Join(dir, v)
-		nt, err := parserFunc(file_path)
+		nt, err := parserFunc(v)
 		if err != nil {
-			log.Fatal(err)
+			// log.Fatal(err)
 			continue
 		}
 		if nt != nil && len(nt.Tasks) > 0 {
