@@ -53,7 +53,7 @@ func DailyFileParser(filename string) (*vault.NoteTask, error) {
 			continue
 		}
 
-		t.Title = strings.TrimSpace(splits[1])
+		t.Title = cleanLine(strings.TrimSpace(splits[1]))
 
 		var desc []string
 

@@ -16,3 +16,8 @@ type NoteTask struct {
 	FilePath string
 	Tasks    []Task
 }
+
+type TaskItem struct {
+	Task     Task
+	Filepath string
+}
