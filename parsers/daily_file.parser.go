@@ -11,7 +11,7 @@ import (
 
 var reTitle = regexp.MustCompile(`]\s+(.*?)\n`)
 var reFile = regexp.MustCompile(`\[\[(.*?)\]\]`)
-var reTag = regexp.MustCompile(`[#@](\w+)`)
+var reTag = regexp.MustCompile(`[#@]([^\s#@]+)`)
 
 func DailyFileParser(filename string) (*vault.NoteTask, error) {
 	f, err := os.Open(filename)
