@@ -10,6 +10,7 @@ import (
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
+	Aliases: []string{"st"},
 	Short: "Personal task and knowledge management tool.",
 	Run: func(cmd *cobra.Command, args []string) {
 		color.Green("Status")
