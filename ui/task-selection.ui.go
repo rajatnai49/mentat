@@ -24,7 +24,7 @@ func (tm TaskUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		switch msg.String() {
-		case "ctrl+c", "q", "esc":
+		case "ctrl+c", "q":
 			return tm, tea.Quit
 		case "enter":
 			selected := tm.tasks[tm.cursor]
@@ -80,11 +80,6 @@ func RenderTasks(tasks []vault.TaskItem) error {
 	if err != nil {
 		return err
 	}
-
-	// 	_, ok := m.(TaskUIModel)
-	// 	if !ok {
-	// 		return fmt.Errorf("Invalid model")
-	// 	}
 
 	return nil
 }

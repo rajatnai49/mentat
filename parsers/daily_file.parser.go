@@ -53,17 +53,13 @@ func DailyFileParser(filename string) (*vault.NoteTask, error) {
 			continue
 		}
 
+		addTagsFiles(strings.TrimSpace(splits[1]), &t)
 		t.Title = cleanLine(strings.TrimSpace(splits[1]))
 
 		var desc []string
 
 		for _, l := range lines[1:] {
-			for _, m := range reTag.FindAllStringSubmatch(l, -1) {
-				t.Tags = append(t.Tags, m[1])
-			}
-			for _, m := range reFile.FindAllStringSubmatch(l, -1) {
-				t.LinkedNotes = append(t.LinkedNotes, m[1])
-			}
+			addTagsFiles(l, &t)
 
 			if clean := cleanLine(l); clean != "" {
 				desc = append(desc, l)
@@ -80,6 +76,15 @@ func DailyFileParser(filename string) (*vault.NoteTask, error) {
 	}
 
 	return &nt, err
+}
+
+func addTagsFiles(l string, t *vault.Task) {
+	for _, m := range reTag.FindAllStringSubmatch(l, -1) {
+		t.Tags = append(t.Tags, m[1])
+	}
+	for _, m := range reFile.FindAllStringSubmatch(l, -1) {
+		t.LinkedNotes = append(t.LinkedNotes, m[1])
+	}
 }
 
 func cleanLine(line string) string {

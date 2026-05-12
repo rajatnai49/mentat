@@ -36,5 +36,5 @@ func generateSummary(noteTasks []*vault.NoteTask) {
 		}
 	}
 
-	ui.RenderTasks(items)
+	ui.RenderList(items)
 }
