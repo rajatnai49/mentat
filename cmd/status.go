@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/fatih/color"
 	"github.com/rajatnai49/mentat/parsers"
 	"github.com/rajatnai49/mentat/ui"
 	"github.com/rajatnai49/mentat/vault"
@@ -9,13 +8,11 @@ import (
 )
 
 var statusCmd = &cobra.Command{
-	Use:   "status",
+	Use:     "status",
 	Aliases: []string{"st"},
-	Short: "Personal task and knowledge management tool.",
+	Short:   "Personal task and knowledge management tool.",
 	Run: func(cmd *cobra.Command, args []string) {
-		color.Green("Status")
-		nts := parsers.FolderIterator(cfg.VaultPath, parsers.DailyFileParser)
-		generateSummary(nts)
+		ui.RenderList(getTaskItems)
 	},
 }
 
@@ -23,9 +20,10 @@ func init() {
 	rootCmd.AddCommand(statusCmd)
 }
 
-func generateSummary(noteTasks []*vault.NoteTask) {
+func getTaskItems() []vault.TaskItem {
+	nts := parsers.FolderIterator(cfg.VaultPath, parsers.DailyFileParser)
 	var items []vault.TaskItem
-	for _, nt := range noteTasks {
+	for _, nt := range nts {
 		for _, t := range nt.Tasks {
 			if !t.Done {
 				items = append(items, vault.TaskItem{
@@ -35,6 +33,5 @@ func generateSummary(noteTasks []*vault.NoteTask) {
 			}
 		}
 	}
-
-	ui.RenderList(items)
+	return items
 }

@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 
+	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
@@ -21,17 +22,18 @@ func newStyles() styles {
 		app: lipgloss.NewStyle().
 			Padding(1, 2),
 		title: lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#25A065")).
+			Foreground(lipgloss.Color("#f4ede8")).
+			Background(lipgloss.Color("#286983")).
 			Padding(0, 1),
 		statusMessage: lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#04B575")),
+			Foreground(lipgloss.Color("#ea9d34")),
 	}
 }
 
 type TaskListModel struct {
 	styles styles
 	list   list.Model
+	loadFn func() []vault.TaskItem
 }
 
 func (m TaskListModel) Init() tea.Cmd {
@@ -57,9 +59,10 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		)
 	case tea.KeyPressMsg:
 		switch msg.String() {
-		case "q", "ctrl+c":
-			return m, tea.Quit
 		case "enter":
+			if m.list.FilterState() == list.Filtering {
+				break
+			}
 			selected := m.list.SelectedItem().(vault.TaskItem)
 
 			c := exec.Command("nvim", selected.Filepath)
@@ -70,6 +73,11 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.ExecProcess(c, func(err error) tea.Msg {
 				return nil
 			})
+		case "r":
+			if m.list.FilterState() == list.Filtering {
+				break
+			}
+			m.refresh()
 		}
 	}
 
@@ -77,25 +85,85 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func RenderList(tasks []vault.TaskItem) error {
+func (m *TaskListModel) refresh() {
+	tasks := m.loadFn()
 	var items []list.Item
 
 	for _, t := range tasks {
 		items = append(items, t)
 	}
 
-	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
-	l.Title = "Tasks Items"
+	m.list.SetItems(items)
+}
+
+func RenderList(loadFn func() []vault.TaskItem) error {
+	tasks := loadFn()
+
+	var items []list.Item
+
+	for _, t := range tasks {
+		items = append(items, t)
+	}
+
+	d := getMentatDelegate()
+
+	l := list.New(items, d, 0, 0)
+	titleStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#f4ede8")).
+		Background(lipgloss.Color("#eb6f92")).
+		Padding(0, 2).
+		Bold(true)
+
+	l.Title = "Task Items"
+	l.Styles.Title = titleStyle
 	l.SetFilteringEnabled(true)
 	l.SetShowFilter(true)
+
+	l.AdditionalShortHelpKeys = func() []key.Binding {
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys("r"),
+				key.WithHelp("r", "refresh"),
+			),
+			key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("enter", "open"),
+			),
+		}
+	}
 
 	p := tea.NewProgram(
 		TaskListModel{
 			styles: newStyles(),
 			list:   l,
+			loadFn: loadFn,
 		},
 	)
 
 	_, err := p.Run()
 	return err
+}
+
+func getMentatDelegate() list.ItemDelegate {
+	d := list.NewDefaultDelegate()
+
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.
+		Foreground(lipgloss.Color("#ebbcba")).
+		BorderForeground(lipgloss.Color("#c4a7e7")).
+		Bold(true)
+
+	d.Styles.SelectedDesc = d.Styles.SelectedDesc.
+		Foreground(lipgloss.Color("#908caa")).
+		BorderForeground(lipgloss.Color("#c4a7e7"))
+
+	d.Styles.NormalTitle = d.Styles.NormalTitle.
+		Foreground(lipgloss.Color("#e0def4"))
+
+	d.Styles.NormalDesc = d.Styles.NormalDesc.
+		Foreground(lipgloss.Color("#6e6a86"))
+
+	d.Styles.DimmedTitle = d.Styles.DimmedTitle.
+		Foreground(lipgloss.Color("#6e6a86"))
+
+	return d
 }
