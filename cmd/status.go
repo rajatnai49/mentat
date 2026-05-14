@@ -10,7 +10,7 @@ import (
 var statusCmd = &cobra.Command{
 	Use:     "status",
 	Aliases: []string{"st"},
-	Short:   "Personal task and knowledge management tool.",
+	Short:   "Get status of all pending tasks.",
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.RenderList(getTaskItems)
 	},
@@ -21,7 +21,21 @@ func init() {
 }
 
 func getTaskItems() []vault.TaskItem {
-	nts := parsers.FolderIterator(cfg.VaultPath, parsers.DailyFileParser)
+	var nts []*vault.NoteTask
+
+	parsers.DailyFilesIterator(cfg.VaultPath, func (path string) error {
+		nt, err := parsers.DailyFileParser(path)
+		if err != nil {
+			return err
+		}
+
+		if nt != nil {
+			nts = append(nts, nt)
+		}
+
+		return nil
+	})
+
 	var items []vault.TaskItem
 	for _, nt := range nts {
 		for _, t := range nt.Tasks {

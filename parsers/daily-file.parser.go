@@ -13,8 +13,8 @@ var reTitle = regexp.MustCompile(`]\s+(.*?)\n`)
 var reFile = regexp.MustCompile(`\[\[(.*?)\]\]`)
 var reTag = regexp.MustCompile(`[#@]([^\s#@]+)`)
 
-func DailyFileParser(filename string) (*vault.NoteTask, error) {
-	f, err := os.Open(filename)
+func DailyFileParser(pathOfFile string) (*vault.NoteTask, error) {
+	f, err := os.Open(pathOfFile)
 	if err != nil {
 		return nil, err
 	}
@@ -22,12 +22,12 @@ func DailyFileParser(filename string) (*vault.NoteTask, error) {
 
 	var nt vault.NoteTask
 
-	info, err := os.Stat(filename)
+	info, err := os.Stat(pathOfFile)
 	if err != nil {
 		return nil, err
 	}
 	nt.Date = info.ModTime().UTC()
-	nt.FilePath = filename
+	nt.FilePath = pathOfFile
 
 	scanner := bufio.NewScanner(f)
 	scanner.Split(TaskScanner)

@@ -18,7 +18,7 @@ var (
 var dlCmd = &cobra.Command{
 	Use:     "daily-note",
 	Aliases: []string{"dl"},
-	Short:   "Create or open daily note",
+	Short:   "Create or open daily, month or year note",
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		var t time.Time
