@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -15,6 +16,10 @@ type styles struct {
 	app           lipgloss.Style
 	title         lipgloss.Style
 	statusMessage lipgloss.Style
+}
+
+type editorErrMsg struct {
+	err error
 }
 
 func newStyles() styles {
@@ -33,7 +38,7 @@ func newStyles() styles {
 type TaskListModel struct {
 	styles styles
 	list   list.Model
-	loadFn func() []vault.TaskItem
+	loadFn func() ([]vault.TaskItem, error)
 }
 
 func (m TaskListModel) Init() tea.Cmd {
@@ -57,6 +62,7 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg.Width-h,
 			msg.Height-v,
 		)
+
 	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "enter":
@@ -71,6 +77,9 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			c.Stderr = os.Stderr
 
 			return m, tea.ExecProcess(c, func(err error) tea.Msg {
+				if err != nil {
+					return editorErrMsg{err: err}
+				}
 				return nil
 			})
 		case "r":
@@ -79,6 +88,13 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.refresh()
 		}
+
+	case editorErrMsg:
+		m.list.NewStatusMessage(
+			m.styles.statusMessage.Render(
+				fmt.Sprintf("failed opening editor: %v", msg.err),
+			),
+		)
 	}
 
 	m.list, cmd = m.list.Update(msg)
@@ -86,7 +102,7 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TaskListModel) refresh() {
-	tasks := m.loadFn()
+	tasks, _ := m.loadFn()
 	var items []list.Item
 
 	for _, t := range tasks {
@@ -96,8 +112,11 @@ func (m *TaskListModel) refresh() {
 	m.list.SetItems(items)
 }
 
-func RenderList(loadFn func() []vault.TaskItem) error {
-	tasks := loadFn()
+func RenderList(loadFn func() ([]vault.TaskItem, error)) error {
+	tasks, err := loadFn()
+	if err != nil {
+		return err
+	}
 
 	var items []list.Item
 
@@ -140,7 +159,7 @@ func RenderList(loadFn func() []vault.TaskItem) error {
 		},
 	)
 
-	_, err := p.Run()
+	_, err = p.Run()
 	return err
 }
 

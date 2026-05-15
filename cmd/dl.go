@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -22,8 +25,15 @@ var dlCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		var t time.Time
+		var err error
 
 		if day != "" {
+			t, err = parseDate(day)
+			if err != nil {
+				log.Fatalln(err)
+				color.Red("Not valid date provided.")
+				return
+			}
 		} else {
 			t = now
 		}
@@ -51,7 +61,10 @@ func createOrOpenFile(t time.Time) {
 	path := cfg.VaultPath + "/" + filename + ".md"
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.WriteFile(path, []byte(""), 0644)
+		if err = os.WriteFile(path, []byte(""), 0644); err != nil {
+			color.Red("Error in file creation: %v", err)
+			return
+		}
 	}
 
 	cmd := exec.Command("nvim", path)
@@ -65,4 +78,35 @@ func createOrOpenFile(t time.Time) {
 		color.Red("%v", err)
 		return
 	}
+}
+
+func parseDate(input string) (time.Time, error) {
+	input = strings.ToLower(strings.TrimSpace(input))
+	t := time.Now()
+
+	switch input {
+	case "today":
+		return t, nil
+	case "yesterday":
+		return t.AddDate(0, 0, -1), nil
+	case "tomorrow":
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	allowedFormats := []string{
+		"2006-01-02",
+		"20060102",
+		"02-01-2006",
+		"02012006",
+	}
+
+	var err error
+	for _, f := range allowedFormats {
+		t, err = time.Parse(f, input)
+		if err == nil {
+			return t, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("Invalid Date")
 }

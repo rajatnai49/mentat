@@ -1,28 +1,45 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"os"
-
-	"github.com/fatih/color"
 )
 
 type Config struct {
 	VaultPath string
 }
 
-func Load() *Config {
-	vault := mustEnv("MENTAT_VAULT")
+func Load() (*Config, error) {
+	keys := []string{
+		"MENTAT_VAULT",
+	}
+
+	values := make(map[string]string)
+	var errs []error
+
+	for _, k := range keys {
+		val, err := getEnv(k)
+		if err != nil {
+			errs = append(errs)
+			continue
+		}
+		values[k] = val
+	}
+
+	if len(errs) > 0 {
+		return nil, errors.Join(errs...)
+	}
 
 	return &Config{
-		VaultPath: vault,
-	}
+		VaultPath: values["MENTAT_VAULT"],
+	}, nil
 }
 
-func mustEnv(key string) string {
+func getEnv(key string) (string, error) {
 	val := os.Getenv(key)
 	if val == "" {
-		color.Red("Not found variable %s", key)
-		os.Exit(1)
+		return "", fmt.Errorf("Missing ENV variable: %s", key)
 	}
-	return val
+	return val, nil
 }

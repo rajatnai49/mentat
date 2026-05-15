@@ -9,7 +9,6 @@ import (
 	"github.com/rajatnai49/mentat/vault"
 )
 
-var reTitle = regexp.MustCompile(`]\s+(.*?)\n`)
 var reFile = regexp.MustCompile(`\[\[(.*?)\]\]`)
 var reTag = regexp.MustCompile(`[#@]([^\s#@]+)`)
 
@@ -44,7 +43,7 @@ func DailyFileParser(pathOfFile string) (*vault.NoteTask, error) {
 
 		l1 := lines[0]
 
-		if strings.Contains(l1, "[x]") {
+		if strings.Contains(l1, "[x]") || strings.Contains(l1, "[X]") {
 			t.Done = true
 		}
 

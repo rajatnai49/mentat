@@ -1,7 +1,8 @@
 package parsers
 
 import (
-	"log"
+	"errors"
+	"fmt"
 	"path/filepath"
 	"regexp"
 )
@@ -16,6 +17,8 @@ func DailyFilesIterator(dir string, fn FileFunc) error {
 
 	re := regexp.MustCompile(`^\d{8}\.md$`)
 
+	var errs []error
+
 	for _, v := range entries {
 		name := filepath.Base(v)
 
@@ -24,10 +27,10 @@ func DailyFilesIterator(dir string, fn FileFunc) error {
 		}
 
 		if err := fn(v); err != nil {
-			log.Println(err)
+			errs = append(errs, fmt.Errorf("%s: %w", name, err))
 			continue
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }

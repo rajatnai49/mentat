@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"github.com/fatih/color"
 	"github.com/rajatnai49/mentat/parsers"
 	"github.com/rajatnai49/mentat/ui"
 	"github.com/rajatnai49/mentat/vault"
 	"github.com/spf13/cobra"
 )
+
+var e bool
 
 var statusCmd = &cobra.Command{
 	Use:     "status",
@@ -17,13 +20,14 @@ var statusCmd = &cobra.Command{
 }
 
 func init() {
+	statusCmd.Flags().BoolVarP(&e, "error", "e", false, "Stop on error")
 	rootCmd.AddCommand(statusCmd)
 }
 
-func getTaskItems() []vault.TaskItem {
+func getTaskItems() ([]vault.TaskItem, error) {
 	var nts []*vault.NoteTask
 
-	parsers.DailyFilesIterator(cfg.VaultPath, func (path string) error {
+	err := parsers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
 		nt, err := parsers.DailyFileParser(path)
 		if err != nil {
 			return err
@@ -36,6 +40,11 @@ func getTaskItems() []vault.TaskItem {
 		return nil
 	})
 
+	if e && err != nil {
+		color.Red("%v", err)
+		return nil, err
+	}
+
 	var items []vault.TaskItem
 	for _, nt := range nts {
 		for _, t := range nt.Tasks {
@@ -47,5 +56,5 @@ func getTaskItems() []vault.TaskItem {
 			}
 		}
 	}
-	return items
+	return items, err
 }

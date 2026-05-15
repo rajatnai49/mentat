@@ -10,9 +10,9 @@ var cleanCmd = &cobra.Command{
 	Use:     "clean",
 	Aliases: []string{"cln"},
 	Short:   "",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string)error {
 		numOfFileChanges := 0
-		parsers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
+		err := parsers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
 			isRenamed, err := parsers.DailyFileCleaner(path)
 			if err != nil {
 				return err
@@ -23,6 +23,7 @@ var cleanCmd = &cobra.Command{
 			return nil
 		})
 		color.Green("Number of files changed: %v\n", numOfFileChanges)
+		return err
 	},
 }
 

@@ -11,20 +11,25 @@ import (
 var cfg *config.Config
 
 var rootCmd = &cobra.Command{
-	Use:     "mentant",
+	Use:     "mentat",
 	Aliases: []string{"mnt"},
 	Short:   "Personal task and knowledge management tool.",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		var err error
 		if cfg == nil {
-			cfg = config.Load()
+			cfg, err = config.Load()
+			if err != nil {
+				return err
+			}
 		}
+		return nil
 	},
 	Version: "1.0.0",
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		color.Red("Fail to execute the command")
+		color.Red("Fail to execute the command with error: %v", err)
 		os.Exit(1)
 	}
 }
