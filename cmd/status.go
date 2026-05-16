@@ -14,8 +14,12 @@ var statusCmd = &cobra.Command{
 	Use:     "status",
 	Aliases: []string{"st"},
 	Short:   "Get status of all pending tasks.",
-	Run: func(cmd *cobra.Command, args []string) {
-		ui.RenderList(cfg, getTaskItems)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := ui.RenderList(cfg, getTaskItems)
+		if e && err != nil {
+			return err
+		}
+		return nil
 	},
 }
 
@@ -56,5 +60,5 @@ func getTaskItems() ([]vault.TaskItem, error) {
 			}
 		}
 	}
-	return items, err
+	return items, nil
 }

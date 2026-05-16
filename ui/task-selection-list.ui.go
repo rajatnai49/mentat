@@ -22,6 +22,10 @@ type editorErrMsg struct {
 	err error
 }
 
+type successMsg struct {
+	status string
+}
+
 func newStyles() styles {
 	return styles{
 		app: lipgloss.NewStyle().
@@ -39,7 +43,7 @@ type TaskListModel struct {
 	styles styles
 	list   list.Model
 	loadFn func() ([]vault.TaskItem, error)
-	cfg *vault.Config
+	cfg    *vault.Config
 }
 
 func (m TaskListModel) Init() tea.Cmd {
@@ -87,7 +91,7 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.list.FilterState() == list.Filtering {
 				break
 			}
-			m.refresh()
+			return m, m.refresh()
 		}
 
 	case editorErrMsg:
@@ -96,14 +100,26 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("failed opening editor: %v", msg.err),
 			),
 		)
+
+	case successMsg:
+		m.list.NewStatusMessage(
+			m.styles.statusMessage.Render(
+				msg.status,
+			),
+		)
 	}
 
 	m.list, cmd = m.list.Update(msg)
 	return m, cmd
 }
 
-func (m *TaskListModel) refresh() {
-	tasks, _ := m.loadFn()
+func (m *TaskListModel) refresh() tea.Cmd {
+	tasks, err := m.loadFn()
+	if err != nil {
+		return func() tea.Msg {
+			return editorErrMsg{err: err}
+		}
+	}
 	var items []list.Item
 
 	for _, t := range tasks {
@@ -111,6 +127,10 @@ func (m *TaskListModel) refresh() {
 	}
 
 	m.list.SetItems(items)
+
+	return func() tea.Msg {
+		return successMsg{status: "Task Refreshed"}
+	}
 }
 
 func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) error {
@@ -157,7 +177,7 @@ func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) erro
 			styles: newStyles(),
 			list:   l,
 			loadFn: loadFn,
-			cfg: cfg,
+			cfg:    cfg,
 		},
 	)
 

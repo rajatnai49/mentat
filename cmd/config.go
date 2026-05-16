@@ -45,7 +45,7 @@ var initConfigCmd = &cobra.Command{
 			color.Yellow("Overwrite [y/n]: ")
 			fmt.Scanln(&ans)
 			ans = strings.ToLower(strings.TrimSpace(ans))
-			if ans != "y" || ans != "yes" {
+			if ans != "y" && ans != "yes" {
 				color.Red("Abort mentat init")
 				return nil
 			}
