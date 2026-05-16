@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/rajatnai49/mentat/vault"
 	"github.com/spf13/cobra"
 )
 
-var cfg *Config
+var cfg *vault.Config
 
 var rootCmd = &cobra.Command{
 	Use:     "mentat",

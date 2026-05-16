@@ -15,7 +15,7 @@ var statusCmd = &cobra.Command{
 	Aliases: []string{"st"},
 	Short:   "Get status of all pending tasks.",
 	Run: func(cmd *cobra.Command, args []string) {
-		ui.RenderList(getTaskItems)
+		ui.RenderList(cfg, getTaskItems)
 	},
 }
 

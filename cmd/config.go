@@ -4,18 +4,15 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
+	"github.com/rajatnai49/mentat/vault"
 	"github.com/spf13/cobra"
 )
-
-type Config struct {
-	VaultPath string `toml:"vault_path"`
-	Editor    string `toml:"editor"`
-}
 
 var configCmd = &cobra.Command{
 	Use:     "config",
@@ -23,7 +20,7 @@ var configCmd = &cobra.Command{
 	Short:   "Handling configs for the Mentat",
 }
 
-var configInitCmd = &cobra.Command{
+var initConfigCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize config file for Mentat",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -72,7 +69,7 @@ var configInitCmd = &cobra.Command{
 			editor = "vim"
 		}
 
-		cfg := Config{
+		cfg := vault.Config{
 			VaultPath: path,
 			Editor:    editor,
 		}
@@ -129,9 +126,52 @@ var showConfigCommand = &cobra.Command{
 	},
 }
 
+var openConfig = &cobra.Command{
+	Use:   "open",
+	Short: "Open config file",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		configPath, err := ConfigPath()
+		if err != nil {
+			return err
+		}
+
+		if _, err = os.Stat(configPath); err != nil {
+			if os.IsNotExist(err) {
+				color.Red("Config file does not exist")
+				return nil
+			}
+
+			return err
+		}
+
+		cfg, err := Load()
+		if err != nil {
+			return err
+		}
+
+		if cfg.Editor == "" {
+			cfg.Editor = "vim"
+		}
+
+		openCmd := exec.Command(cfg.Editor, configPath)
+
+		openCmd.Stdin = os.Stdin
+		openCmd.Stdout = os.Stdout
+		openCmd.Stderr = os.Stderr
+
+		err = openCmd.Run()
+		if err != nil {
+			return err
+		}
+
+		return nil
+	},
+}
+
 func init() {
-	configCmd.AddCommand(configInitCmd)
+	configCmd.AddCommand(initConfigCmd)
 	configCmd.AddCommand(showConfigCommand)
+	configCmd.AddCommand(openConfig)
 	rootCmd.AddCommand(configCmd)
 }
 
@@ -148,13 +188,13 @@ func ConfigPath() (string, error) {
 	), nil
 }
 
-func Load() (*Config, error) {
+func Load() (*vault.Config, error) {
 	path, err := ConfigPath()
 	if err != nil {
 		return nil, err
 	}
 
-	var cfg Config
+	var cfg vault.Config
 
 	_, err = toml.DecodeFile(path, &cfg)
 	if err != nil {

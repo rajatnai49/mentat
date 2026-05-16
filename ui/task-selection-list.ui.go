@@ -39,6 +39,7 @@ type TaskListModel struct {
 	styles styles
 	list   list.Model
 	loadFn func() ([]vault.TaskItem, error)
+	cfg *vault.Config
 }
 
 func (m TaskListModel) Init() tea.Cmd {
@@ -71,7 +72,7 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			selected := m.list.SelectedItem().(vault.TaskItem)
 
-			c := exec.Command("nvim", selected.Filepath)
+			c := exec.Command(m.cfg.Editor, selected.Filepath)
 			c.Stdout = os.Stdout
 			c.Stdin = os.Stdin
 			c.Stderr = os.Stderr
@@ -112,7 +113,7 @@ func (m *TaskListModel) refresh() {
 	m.list.SetItems(items)
 }
 
-func RenderList(loadFn func() ([]vault.TaskItem, error)) error {
+func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) error {
 	tasks, err := loadFn()
 	if err != nil {
 		return err
@@ -156,6 +157,7 @@ func RenderList(loadFn func() ([]vault.TaskItem, error)) error {
 			styles: newStyles(),
 			list:   l,
 			loadFn: loadFn,
+			cfg: cfg,
 		},
 	)
 
