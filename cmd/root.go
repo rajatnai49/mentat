@@ -10,11 +10,16 @@ import (
 )
 
 var cfg *vault.Config
+var version = "dev"
 
 var rootCmd = &cobra.Command{
 	Use:     "mentat",
 	Aliases: []string{"mnt"},
-	Short:   "Personal task and knowledge management tool.",
+	Short:   "Manage daily notes and pending tasks from a local markdown vault.",
+	Long: `Mentat is a terminal tool for working with a local markdown vault.
+
+It can create or open daily, monthly, and yearly notes, scan daily notes for
+pending checkbox tasks, and show those tasks in an interactive list.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if strings.HasPrefix(
 			cmd.CommandPath(),
@@ -32,7 +37,7 @@ var rootCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Version: "1.0.0",
+	Version: version,
 }
 
 func Execute() {

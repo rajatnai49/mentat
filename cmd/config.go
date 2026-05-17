@@ -17,12 +17,20 @@ import (
 var configCmd = &cobra.Command{
 	Use:     "config",
 	Aliases: []string{"cfg"},
-	Short:   "Handling configs for the Mentat",
+	Short:   "Manage Mentat configuration.",
+	Long: `Manage Mentat configuration.
+
+The config file stores your markdown vault path and preferred editor. Mentat
+uses this config for task scanning and opening files from interactive views.`,
 }
 
 var initConfigCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialize config file for Mentat",
+	Short: "Create the Mentat config file.",
+	Long: `Create the Mentat config file.
+
+Mentat will ask for your vault path and preferred editor, then write the config
+to your user config directory at mentat/config.toml.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		userConfigDir, err := os.UserConfigDir()
 		if err != nil {
@@ -94,7 +102,10 @@ var initConfigCmd = &cobra.Command{
 
 var showConfigCommand = &cobra.Command{
 	Use:   "show",
-	Short: "See the current configuration of the Mentat",
+	Short: "Show the current Mentat configuration.",
+	Long: `Show the current Mentat configuration.
+
+Prints the config file path, vault path, and editor currently used by Mentat.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath, err := ConfigPath()
 		if err != nil {
@@ -128,7 +139,10 @@ var showConfigCommand = &cobra.Command{
 
 var openConfig = &cobra.Command{
 	Use:   "open",
-	Short: "Open config file",
+	Short: "Open the Mentat config file in your editor.",
+	Long: `Open the Mentat config file in your configured editor.
+
+If no editor is configured, Mentat falls back to vim.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath, err := ConfigPath()
 		if err != nil {

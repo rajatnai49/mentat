@@ -13,7 +13,12 @@ var e bool
 var statusCmd = &cobra.Command{
 	Use:     "status",
 	Aliases: []string{"st"},
-	Short:   "Get status of all pending tasks.",
+	Short:   "Show all pending tasks from daily notes.",
+	Long: `Show all pending tasks from daily notes.
+
+Mentat scans markdown files named YYYYMMDD.md in your vault, extracts unchecked
+checkbox tasks, and displays them in an interactive list. Select a task and
+press enter to open its source note in your configured editor.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := ui.RenderList(cfg, getTaskItems)
 		if e && err != nil {

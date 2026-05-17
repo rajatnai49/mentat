@@ -21,7 +21,12 @@ var (
 var dlCmd = &cobra.Command{
 	Use:     "daily-note",
 	Aliases: []string{"dl"},
-	Short:   "Create or open daily, month or year note",
+	Short:   "Create or open a daily, monthly, or yearly note.",
+	Long: `Create or open a daily, monthly, or yearly note.
+
+Mentat creates the note file in your configured vault if it does not already
+exist, then opens it in nvim. Use --day to choose a date, --month for a monthly
+note, or --year for a yearly note.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		var t time.Time
