@@ -4,7 +4,7 @@ Mentat is a simple tool for managing task via markdown files.
 
 It lets you create daily task notes and give you list of the pending task.
 
-![Mentat Recording](./mentat.gif)
+![Mentat Recording](./mentat-usage.gif)
 
 ## Setup
 
