@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"slices"
+
 	"github.com/fatih/color"
 	"github.com/rajatnai49/mentat/parsers"
 	"github.com/rajatnai49/mentat/ui"
@@ -65,5 +67,6 @@ func getTaskItems() ([]vault.TaskItem, error) {
 			}
 		}
 	}
+	slices.Reverse(items)
 	return items, nil
 }
