@@ -126,6 +126,7 @@ func (m *TaskListModel) refresh() tea.Cmd {
 		items = append(items, t)
 	}
 
+	m.list.ResetFilter()
 	m.list.SetItems(items)
 
 	return func() tea.Msg {
