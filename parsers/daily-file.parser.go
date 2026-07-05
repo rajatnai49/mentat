@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/rajatnai49/mentat/vault"
 )
@@ -75,6 +76,15 @@ func DailyFileParser(pathOfFile string) (*vault.NoteTask, error) {
 	}
 
 	return &nt, err
+}
+
+func DailyFilePath(vaultPath string) string {
+	t := time.Now()
+	filename := t.Format("20060102")
+
+	path := vaultPath + "/" + filename + ".md"
+
+	return path
 }
 
 func addTagsFiles(l string, t *vault.Task) {

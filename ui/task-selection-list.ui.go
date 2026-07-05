@@ -42,8 +42,9 @@ func newStyles() styles {
 type TaskListModel struct {
 	styles styles
 	list   list.Model
-	loadFn func() ([]vault.TaskItem, error)
+	loadFn func(bool) ([]vault.TaskItem, error)
 	cfg    *vault.Config
+	isAll  bool
 }
 
 func (m TaskListModel) Init() tea.Cmd {
@@ -92,6 +93,9 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				break
 			}
 			return m, m.refresh()
+		case "a":
+			m.isAll = !m.isAll
+			return m, m.refresh()
 		}
 
 	case editorErrMsg:
@@ -114,7 +118,7 @@ func (m TaskListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TaskListModel) refresh() tea.Cmd {
-	tasks, err := m.loadFn()
+	tasks, err := m.loadFn(m.isAll)
 	if err != nil {
 		return func() tea.Msg {
 			return editorErrMsg{err: err}
@@ -130,12 +134,12 @@ func (m *TaskListModel) refresh() tea.Cmd {
 	m.list.SetItems(items)
 
 	return func() tea.Msg {
-		return successMsg{status: "Task Refreshed"}
+		return successMsg{status: "Tasks Refreshed"}
 	}
 }
 
-func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) error {
-	tasks, err := loadFn()
+func RenderList(cfg *vault.Config, loadFn func(all bool) ([]vault.TaskItem, error), isAll bool) error {
+	tasks, err := loadFn(isAll)
 	if err != nil {
 		return err
 	}
@@ -170,6 +174,10 @@ func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) erro
 				key.WithKeys("enter"),
 				key.WithHelp("enter", "open"),
 			),
+			key.NewBinding(
+				key.WithKeys("a"),
+				key.WithHelp("a", "toggle all/daily"),
+			),
 		}
 	}
 
@@ -179,6 +187,7 @@ func RenderList(cfg *vault.Config, loadFn func() ([]vault.TaskItem, error)) erro
 			list:   l,
 			loadFn: loadFn,
 			cfg:    cfg,
+			isAll:  isAll,
 		},
 	)
 
