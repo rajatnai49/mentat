@@ -27,7 +27,8 @@ mentat dl                 # open today's daily note
 mentat dl -d 2026-05-16   # open a specific daily note
 mentat dl -m              # open this month's note
 mentat dl -y              # open this year's note
-mentat status             # view pending tasks
+mentat status             # view today pending tasks
+mentat status -a          # view all pending tasks
 mentat clean              # rename completed daily notes with -X
 mentat config show        # show config
 mentat config open        # edit config
