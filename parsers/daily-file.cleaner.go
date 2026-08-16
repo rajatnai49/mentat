@@ -7,6 +7,15 @@ import (
 )
 
 func DailyFileCleaner(pathOfFile string) (bool, error) {
+	isEmpty, err := isEmptyFile(pathOfFile)
+	if isEmpty {
+		err = os.Remove(pathOfFile)
+		if err != nil {
+			return false, err
+		}
+		return false, nil
+	}
+
 	noteTask, err := DailyFileParser(pathOfFile)
 	if err != nil {
 		return false, err
@@ -38,4 +47,12 @@ func DailyFileCleaner(pathOfFile string) (bool, error) {
 	}
 
 	return !isAnyPending, nil
+}
+
+func isEmptyFile(filepath string) (bool, error) {
+	stat, err := os.Stat(filepath)
+	if err != nil {
+		return false, err
+	}
+	return stat.Size() == 0, nil
 }
