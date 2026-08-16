@@ -13,7 +13,7 @@ func DailyFileCleaner(pathOfFile string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		return false, nil
+		return true, nil
 	}
 
 	noteTask, err := DailyFileParser(pathOfFile)
