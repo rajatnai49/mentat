@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -32,6 +33,7 @@ var initConfigCmd = &cobra.Command{
 Mentat will ask for your vault path and preferred editor, then write the config
 to your user config directory at mentat/config.toml.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		reader := bufio.NewReader(os.Stdin)
 		userConfigDir, err := os.UserConfigDir()
 		if err != nil {
 			color.Red("Not be able to find config dir")
@@ -62,7 +64,10 @@ to your user config directory at mentat/config.toml.`,
 		var path, editor string
 
 		color.Green("Vault path (required): ")
-		fmt.Scanln(&path)
+		path, err = reader.ReadString('\n')
+		if err != nil {
+			return err
+		}
 		path = strings.TrimSpace(path)
 		if path == "" {
 			color.Red("Vault path require for the config")
@@ -70,7 +75,10 @@ to your user config directory at mentat/config.toml.`,
 		}
 
 		color.Green("Editor you prefer [vim]: ")
-		fmt.Scanln(&editor)
+		editor, err = reader.ReadString('\n')
+		if err != nil {
+			return err
+		}
 		editor = strings.TrimSpace(editor)
 
 		if editor == "" {
