@@ -72,13 +72,22 @@ func createOrOpenFile(t time.Time) {
 		}
 	}
 
-	cmd := exec.Command("nvim", path)
+	cfg, err := Load()
+	if err != nil {
+		color.Red("%v", err)
+	}
+
+	if cfg.Editor == "" {
+		cfg.Editor = "vim"
+	}
+
+	cmd := exec.Command(cfg.Editor, path)
 
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		color.Red("%v", err)
 		return
