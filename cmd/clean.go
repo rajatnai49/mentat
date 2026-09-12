@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/fatih/color"
-	"github.com/rajatnai49/mentat/parsers"
+	"github.com/rajatnai49/mentat/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +17,8 @@ no unchecked checkbox tasks, it is renamed with an -X suffix, for example
 20260516.md becomes 20260516-X.md.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		numOfFileChanges := 0
-		err := parsers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
-			isRenamed, err := parsers.DailyFileCleaner(path)
+		err := helpers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
+			isRenamed, err := helpers.DailyFileCleaner(path)
 			if err != nil {
 				return err
 			}
@@ -26,7 +26,7 @@ no unchecked checkbox tasks, it is renamed with an -X suffix, for example
 				numOfFileChanges++
 			}
 			return nil
-		})
+		}, true)
 		color.Green("Number of files changed: %v\n", numOfFileChanges)
 		return err
 	},

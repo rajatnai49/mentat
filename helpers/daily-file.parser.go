@@ -1,5 +1,4 @@
-package parsers
-
+package helpers
 import (
 	"bufio"
 	"os"

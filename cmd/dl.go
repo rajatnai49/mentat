@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/rajatnai49/mentat/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +32,7 @@ note, or --year for a yearly note.`,
 		var err error
 
 		if day != "" {
-			t, err = parseDate(day)
+			t, err = helpers.ParseDate(day)
 			if err != nil {
 				log.Fatalln(err)
 				color.Red("Not valid date provided.")
@@ -94,33 +93,3 @@ func createOrOpenFile(t time.Time) {
 	}
 }
 
-func parseDate(input string) (time.Time, error) {
-	input = strings.ToLower(strings.TrimSpace(input))
-	t := time.Now()
-
-	switch input {
-	case "today":
-		return t, nil
-	case "yesterday":
-		return t.AddDate(0, 0, -1), nil
-	case "tomorrow":
-		return t.AddDate(0, 0, 1), nil
-	}
-
-	allowedFormats := []string{
-		"2006-01-02",
-		"20060102",
-		"02-01-2006",
-		"02012006",
-	}
-
-	var err error
-	for _, f := range allowedFormats {
-		t, err = time.Parse(f, input)
-		if err == nil {
-			return t, nil
-		}
-	}
-
-	return time.Time{}, fmt.Errorf("Invalid Date")
-}

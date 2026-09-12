@@ -4,7 +4,7 @@ import (
 	"slices"
 
 	"github.com/fatih/color"
-	"github.com/rajatnai49/mentat/parsers"
+	"github.com/rajatnai49/mentat/helpers"
 	"github.com/rajatnai49/mentat/ui"
 	"github.com/rajatnai49/mentat/vault"
 	"github.com/spf13/cobra"
@@ -42,8 +42,8 @@ func getTaskItems(all bool) ([]vault.TaskItem, error) {
 	var err error
 
 	if all {
-		err = parsers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
-			nt, err := parsers.DailyFileParser(path)
+		err = helpers.DailyFilesIterator(cfg.VaultPath, func(path string) error {
+			nt, err := helpers.DailyFileParser(path)
 			if err != nil {
 				return err
 			}
@@ -53,11 +53,11 @@ func getTaskItems(all bool) ([]vault.TaskItem, error) {
 			}
 
 			return nil
-		})
+		}, false)
 	} else {
-		daily_path := parsers.DailyFilePath(cfg.VaultPath)
+		daily_path := helpers.DailyFilePath(cfg.VaultPath)
 
-		nt, derr := parsers.DailyFileParser(daily_path)
+		nt, derr := helpers.DailyFileParser(daily_path)
 		if err != nil {
 			err = derr
 		} else if(nt != nil) {
