@@ -36,15 +36,13 @@ to your user config directory at mentat/config.toml.`,
 		reader := bufio.NewReader(os.Stdin)
 		userConfigDir, err := os.UserConfigDir()
 		if err != nil {
-			color.Red("Not be able to find config dir")
-			return err
+			return fmt.Errorf("Not be able to find config dir: %w", err)
 		}
 
 		mentatDir := filepath.Join(userConfigDir, "mentat")
 		err = os.MkdirAll(mentatDir, 0755)
 		if err != nil {
-			color.Red("Not be able to create mentat config folder")
-			return err
+			return fmt.Errorf("Not be able to create mentat config folder: %w", err)
 		}
 
 		mentatFile := filepath.Join(mentatDir, "config.toml")
@@ -94,14 +92,12 @@ to your user config directory at mentat/config.toml.`,
 
 		err = toml.NewEncoder(&buf).Encode(cfg)
 		if err != nil {
-			color.Red("Error in the saving file")
-			return err
+			return fmt.Errorf("Error in the encode file: %w", err)
 		}
 
 		err = os.WriteFile(mentatFile, buf.Bytes(), 0644)
 		if err != nil {
-			color.Red("Error in the saving config file")
-			return err
+			return fmt.Errorf("Error in the saving file: %w", err)
 		}
 
 		return nil
