@@ -17,10 +17,6 @@ var vaultCmd = &cobra.Command{
 	Long: `Open your configured notes vault in the editor.
 	Use -e <editor-name> to open the vault with a different editor.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := Load()
-		if err != nil {
-			return err
-		}
 		editor := cfg.Editor
 		if editor_name != "" {
 			editor = editor_name
@@ -32,7 +28,7 @@ var vaultCmd = &cobra.Command{
 		op_cmd.Stdout = os.Stdout
 		op_cmd.Stderr = os.Stderr
 
-		err = op_cmd.Run()
+		err := op_cmd.Run()
 		if err != nil {
 			return fmt.Errorf("Error in opening vault: %w", err)
 		}

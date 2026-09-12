@@ -84,11 +84,6 @@ func createOrOpenFile(t time.Time, template_name string) error {
 		}
 	}
 
-	cfg, err := Load()
-	if err != nil {
-		return fmt.Errorf("Error in loading config: %w", err)
-	}
-
 	if cfg.Editor == "" {
 		cfg.Editor = "vim"
 	}
@@ -99,7 +94,7 @@ func createOrOpenFile(t time.Time, template_name string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("Error in opening file: %w", err)
 	}

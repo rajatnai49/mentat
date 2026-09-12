@@ -64,4 +64,5 @@ tags like `#docs` and linked notes like `[[Mentat]]`.
 ```sh
 mentat template -n <template-name> # create new template in your template list '/templates'
 mentat dl -t <template-name>       # creates dl file with content of the template
+mentat template -l                 # list all templates
 ```
