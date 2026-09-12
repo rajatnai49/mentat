@@ -17,10 +17,11 @@ var (
 var templateCmd = &cobra.Command{
 	Use:     "create-template",
 	Aliases: []string{"tmpl"},
-	Short:   "Create or open a template note.",
-	Long: `Create or open a template note.
+	Short:   "Create or open a note template.",
+	Long: `Create or open a note template.
 
-	Mentat create the note file in your configured vault '/templates' folder if it does not already exist, then opens it in configured editor.`,
+	Mentat stores templates in the templates/ folder of your configured vault. If the template does not exist, Mentat creates it, then opens it in your configured editor.`,
+
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validName := regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 		if !validName.MatchString(template_name) {

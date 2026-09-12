@@ -32,6 +32,8 @@ mentat status -a          # view all pending tasks
 mentat clean              # rename completed daily notes with -X
 mentat config show        # show config
 mentat config open        # edit config
+mentat vault              # open configured vault
+mentat vault -e <editor>  # open configured vault in different editor
 mentat -h                 # find help
 ```
 
@@ -57,3 +59,9 @@ mentat cfg   # config
 Mentat treats `- [ ]` as pending and `- [x]` / `- [X]` as done. It also reads
 tags like `#docs` and linked notes like `[[Mentat]]`.
 
+## Template usage
+
+```sh
+mentat template -n <template-name> # create new template in your template list '/templates'
+mentat dl -t <template-name>       # creates dl file with content of the template
+```

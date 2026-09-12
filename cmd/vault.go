@@ -13,8 +13,9 @@ var editor_name string
 var vaultCmd = &cobra.Command{
 	Use: "vault",
 	Aliases: []string{"vlt"},
-	Short:   "Open mentat vault in the editor.",
-	Long: `Open mentat vault in the editor.`,
+	Short:   "Open the configured notes vault.",
+	Long: `Open your configured notes vault in the editor.
+	Use -e <editor-name> to open the vault with a different editor.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := Load()
 		if err != nil {
