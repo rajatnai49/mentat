@@ -219,5 +219,9 @@ func Load() (*vault.Config, error) {
 		return nil, err
 	}
 
+	if cfg.Editor == "" {
+		cfg.Editor = "vim"
+	}
+
 	return &cfg, nil
 }
